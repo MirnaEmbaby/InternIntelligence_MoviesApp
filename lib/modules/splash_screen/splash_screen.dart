@@ -1,36 +1,20 @@
-import 'dart:async';
-
+import 'package:easy_splash_screen/easy_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/modules/login_screen/login_screen.dart';
 import 'package:movies_app/shared/components/constants.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Timer(
-        const Duration(seconds: 3),
-        () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const LoginScreen())));
-  }
+class MySplashScreen extends StatelessWidget {
+  const MySplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      height: MediaQuery.of(context).size.height,
-      child: const Icon(
-        Icons.movie_filter_rounded,
-        color: mainColor,
-        size: 150,
-      ),
+    return EasySplashScreen(
+      logo: Image.asset('assets/images/video-play-128.png'),
+      durationInSeconds: 2,
+      showLoader: false,
+      logoWidth: 200,
+      backgroundColor: defBlack,
+      navigator: const LoginScreen(),
     );
   }
 }
