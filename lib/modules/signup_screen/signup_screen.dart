@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/layout_screen.dart';
-import 'package:movies_app/modules/login_screen/login_screen.dart';
 import 'package:movies_app/modules/signup_screen/cubit/cubit.dart';
 import 'package:movies_app/modules/signup_screen/cubit/states.dart';
 import 'package:movies_app/shared/styles/colors.dart';
@@ -14,7 +13,7 @@ class SignUpScreen extends StatelessWidget {
 
   var formKey = GlobalKey<FormState>();
   var emailController = TextEditingController();
-  var nameController = TextEditingController();
+  var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
   bool errorState = false;
@@ -54,11 +53,11 @@ class SignUpScreen extends StatelessWidget {
                         context: context,
                         isPass: false,
                         suffixIcon: null,
-                        controller: nameController,
-                        text: 'Name',
+                        controller: usernameController,
+                        text: 'Username',
                         validate: (value) {
                           if (value.isEmpty) {
-                            return 'name must not be empty';
+                            return 'username must not be empty';
                           }
                         },
                       ),
@@ -95,52 +94,18 @@ class SignUpScreen extends StatelessWidget {
                         },
                       ),
                       const SizedBox(
-                        height: 10.0,
-                      ),
-                      if (errorState == true)
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.error_outline_rounded,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(
-                              width: 10.0,
-                            ),
-                            Text(
-                              'email address or password is incorrect',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: Colors.red,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      Align(
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: TextButton(
-                          style: ButtonStyle(
-                              padding:
-                                  WidgetStateProperty.all(EdgeInsets.zero)),
-                          onPressed: () {},
-                          child: Text(
-                            'Forgot Password?',
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 16.0,
+                        height: 40.0,
                       ),
                       defButton(
                         context: context,
                         text: 'Sign up',
-                        function: () {},
+                        function: () {
+                          SignUpCubit.get(context).signUp(
+                            userName: usernameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                          );
+                        },
                       ),
                       const SizedBox(
                         height: 10.0,
@@ -258,7 +223,7 @@ class SignUpScreen extends StatelessWidget {
                           ),
                           TextButton(
                               onPressed: () {
-                                navigateTo(context, LoginScreen());
+                                Navigator.pop(context);
                               },
                               style: const ButtonStyle(
                                 padding: WidgetStatePropertyAll(
@@ -284,7 +249,7 @@ class SignUpScreen extends StatelessWidget {
           );
         },
         listener: (context, state) {
-          if (state is SignUpSuccessState) {
+          if (state is CreateUserSuccessState) {
             navigateAndFinish(context, const LayoutScreen());
           }
         },

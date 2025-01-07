@@ -26,6 +26,9 @@ Widget defTextFormField({
 }) {
   return TextFormField(
     controller: controller,
+    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+          fontWeight: FontWeight.bold,
+        ),
     obscureText: isPass && passHidden ? true : false,
     decoration: InputDecoration(
       hintText: text,
