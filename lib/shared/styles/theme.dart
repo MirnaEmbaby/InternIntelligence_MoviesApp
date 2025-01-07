@@ -10,6 +10,16 @@ ThemeData myTheme = ThemeData(
       color: defWhite,
       fontSize: 14,
     ),
+    headlineMedium: GoogleFonts.poppins(
+      color: defWhite,
+      fontSize: 22,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineSmall: GoogleFonts.poppins(
+      color: defWhite,
+      fontSize: 18,
+      fontWeight: FontWeight.w800,
+    ),
     labelLarge: GoogleFonts.poppins(
       color: defWhite,
       fontSize: 24,
@@ -35,4 +45,5 @@ ThemeData myTheme = ThemeData(
       fontSize: 14,
     ),
   ),
+  primaryColor: defPink,
 );

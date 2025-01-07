@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/shared/bloc_observer.dart';
-import 'package:movies_app/shared/network/cache_helper.dart';
+import 'package:movies_app/shared/network/local/cache_helper.dart';
+import 'package:movies_app/shared/network/remote/dio_helper.dart';
 import 'package:movies_app/shared/styles/theme.dart';
 
 import 'firebase_options.dart';
@@ -16,6 +17,7 @@ void main() async {
   Bloc.observer = MyBlocObserver();
 
   await CacheHelper.init();
+  await DioHelper.init();
 
   Widget widget;
   String? uId = CacheHelper.getData(key: 'uId');

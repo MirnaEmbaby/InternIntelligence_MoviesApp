@@ -6,7 +6,7 @@ import 'package:movies_app/modules/login_screen/cubit/states.dart';
 import 'package:movies_app/modules/signup_screen/signup_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 
-import '../../shared/network/cache_helper.dart';
+import '../../shared/network/local/cache_helper.dart';
 import '../../shared/styles/colors.dart';
 
 // ignore: must_be_immutable
