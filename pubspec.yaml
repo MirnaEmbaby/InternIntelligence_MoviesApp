@@ -37,8 +37,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   easy_splash_screen: ^1.0.4
   google_fonts: ^6.2.1
+  fluttertoast: ^8.2.10
+
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
+
   firebase_core: ^3.9.0
   firebase_auth: ^5.3.4
 

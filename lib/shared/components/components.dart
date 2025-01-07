@@ -15,21 +15,25 @@ void navigateAndFinish(context, widget) => Navigator.pushAndRemoveUntil(
     );
 
 Widget defTextFormField({
-  required bool isPass,
+  required BuildContext context,
+  bool isPass = false,
+  bool passHidden = true,
   required TextEditingController? controller,
   required String? text,
   required Function validate,
+  Function? onSuffixPressed,
+  IconData? suffixIcon,
 }) {
   return TextFormField(
     controller: controller,
-    obscureText: isPass ? true : false,
+    obscureText: isPass && passHidden ? true : false,
     decoration: InputDecoration(
       hintText: text,
       suffixIcon: isPass
           ? IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.visibility_outlined,
+              onPressed: () => onSuffixPressed!(),
+              icon: Icon(
+                suffixIcon,
               ),
             )
           : null,
@@ -52,7 +56,7 @@ Widget defButton({
       horizontal: 20.0,
       vertical: 8.0,
     ),
-    onPressed: () => function,
+    onPressed: () => function(),
     child: Text(
       text!,
       style: Theme.of(context)

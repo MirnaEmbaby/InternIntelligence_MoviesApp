@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:766671517400:android:a8fc7627821068423e49ad",
         "android_client_info": {
-          "package_name": "com.a"
+          "package_name": "com.example.movies_app"
         }
       },
       "oauth_client": [
