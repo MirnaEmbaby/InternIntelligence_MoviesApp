@@ -6,6 +6,7 @@ import 'package:movies_app/modules/login_screen/cubit/states.dart';
 import 'package:movies_app/modules/signup_screen/signup_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 
+import '../../shared/network/cache_helper.dart';
 import '../../shared/styles/colors.dart';
 
 // ignore: must_be_immutable
@@ -272,6 +273,7 @@ class LoginScreen extends StatelessWidget {
         },
         listener: (context, state) {
           if (state is LoginSuccessState) {
+            CacheHelper.saveData(key: 'uId', value: state.uId);
             navigateAndFinish(context, const LayoutScreen());
           }
 
