@@ -89,7 +89,6 @@ class LayoutScreen extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) => genreItem(
                               context,
-                              index,
                               AppCubit.get(context)
                                   .genresModel!
                                   .genres![index]),
@@ -182,7 +181,7 @@ class LayoutScreen extends StatelessWidget {
   }
 }
 
-Widget genreItem(context, index, Genres list) {
+Widget genreItem(context, Genres list) {
   return TextButton(
     onPressed: () {},
     style: const ButtonStyle(
