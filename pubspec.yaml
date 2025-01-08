@@ -39,6 +39,7 @@ dependencies:
   google_fonts: ^6.2.1
   fluttertoast: ^8.2.10
   carousel_slider: ^5.0.0
+  conditional_builder_null_safety: ^0.0.6
 
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6

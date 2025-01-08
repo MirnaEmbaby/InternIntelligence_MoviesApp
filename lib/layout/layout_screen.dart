@@ -1,8 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
+import 'package:movies_app/models/genres_model.dart';
 import 'package:movies_app/shared/styles/colors.dart';
 
 class LayoutScreen extends StatelessWidget {
@@ -72,17 +74,33 @@ class LayoutScreen extends StatelessWidget {
                   const SizedBox(
                     height: 16.0,
                   ),
-                  SizedBox(
-                    height: 50.0,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => genreItem(context),
-                      separatorBuilder: (context, index) => const SizedBox(
-                        width: 10.0,
-                      ),
-                      itemCount: 5,
-                    ),
+                  ConditionalBuilder(
+                    condition: AppCubit.get(context).genresModel != null,
+                    fallback: (context) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
+                    builder: (context) {
+                      return SizedBox(
+                        height: 50.0,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => genreItem(
+                              context,
+                              index,
+                              AppCubit.get(context)
+                                  .genresModel!
+                                  .genres![index]),
+                          separatorBuilder: (context, index) => const SizedBox(
+                            width: 10.0,
+                          ),
+                          itemCount:
+                              AppCubit.get(context).genresModel!.genres!.length,
+                        ),
+                      );
+                    },
                   ),
                   header(
                     context: context,
@@ -164,7 +182,7 @@ class LayoutScreen extends StatelessWidget {
   }
 }
 
-Widget genreItem(context) {
+Widget genreItem(context, index, Genres list) {
   return TextButton(
     onPressed: () {},
     style: const ButtonStyle(
@@ -179,7 +197,7 @@ Widget genreItem(context) {
       ),
     ),
     child: Text(
-      'Fantasy',
+      list.name!,
       style: Theme.of(context).textTheme.bodySmall!.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -220,7 +238,9 @@ Widget lastWatchedListItem(context) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(10.0),
     child: InkWell(
-      onTap: () {},
+      onTap: () {
+        AppCubit.get(context).getGenres();
+      },
       child: SizedBox(
         width: 250.0,
         height: 100.0,
