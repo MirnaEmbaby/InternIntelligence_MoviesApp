@@ -42,7 +42,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AppCubit()..getGenres(),
+      create: (context) => AppCubit()
+        ..getUserData()
+        ..getGenres(),
       child: BlocConsumer<AppCubit, AppStates>(
         builder: (context, state) {
           return SafeArea(

@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
+import 'package:movies_app/modules/login_screen/login_screen.dart';
+import 'package:movies_app/modules/search_screen/search_screen.dart';
+import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/shared/styles/colors.dart';
 
 class LayoutScreen extends StatelessWidget {
@@ -15,165 +18,297 @@ class LayoutScreen extends StatelessWidget {
     return BlocConsumer<AppCubit, AppStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        return Scaffold(
-          body: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              color: defBlack,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10.0),
-                    child: CarouselSlider.builder(
-                      itemCount: 3,
-                      itemBuilder: (context, index, pageViewIndex) {
-                        return Stack(
-                          alignment: Alignment.bottomLeft,
+        var model = AppCubit.get(context).userModel;
+
+        return ConditionalBuilder(
+          condition: AppCubit.get(context).userModel != null,
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              backgroundColor: defBlack,
+              actionsIconTheme: const IconThemeData(
+                color: defWhite,
+              ),
+              iconTheme: const IconThemeData(
+                color: defWhite,
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.search_outlined,
+                    size: 30.0,
+                  ),
+                  onPressed: () {
+                    navigateTo(
+                      context,
+                      const SearchScreen(),
+                    );
+                  },
+                ),
+                const SizedBox(
+                  width: 10.0,
+                ),
+              ],
+            ),
+            drawer: Drawer(
+              backgroundColor: defBlack,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 50.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Stack(
+                          alignment: Alignment.bottomRight,
                           children: [
-                            Container(
-                              foregroundDecoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    defBlack,
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  stops: [0.4, 0.9],
-                                ),
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                model!.image,
                               ),
-                              child: const Image(
-                                width: double.infinity,
-                                image: NetworkImage(
-                                    'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/action-mistery-movie-poster-design-template-2ec690d65c22aa12e437d765dbf7e4af_screen.jpg?ts=1680854635'),
-                                fit: BoxFit.cover,
-                              ),
+                              radius: 70.0,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(14.0),
-                              child: Text(
-                                'OUTSIDER (2020)',
-                                style:
-                                    Theme.of(context).textTheme.headlineMedium,
+                            CircleAvatar(
+                              radius: 18.0,
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.camera_alt_outlined,
+                                  size: 20.0,
+                                ),
                               ),
                             ),
                           ],
-                        );
-                      },
-                      options: CarouselOptions(
-                        height: 250.0,
-                        enableInfiniteScroll: true,
-                        autoPlay: true,
-                        viewportFraction: 1.0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  ConditionalBuilder(
-                    condition: AppCubit.get(context).genresModel != null,
-                    fallback: (context) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    },
-                    builder: (context) {
-                      return SizedBox(
-                        height: 50.0,
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => genreItem(
-                              context,
-                              AppCubit.get(context)
-                                  .genresModel!
-                                  .genres![index]),
-                          separatorBuilder: (context, index) => const SizedBox(
-                            width: 10.0,
-                          ),
-                          itemCount:
-                              AppCubit.get(context).genresModel!.genres!.length,
                         ),
-                      );
-                    },
-                  ),
-                  header(
-                    context: context,
-                    text: 'Last watched',
-                    function: () {},
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  SizedBox(
-                    height: 200.0,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) =>
-                          lastWatchedListItem(context),
-                      separatorBuilder: (context, index) => const SizedBox(
-                        width: 16.0,
-                      ),
-                      itemCount: 5,
+                        const SizedBox(
+                          height: 20.0,
+                        ),
+                        Text(
+                          model.userName,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  header(
-                    context: context,
-                    text: 'Trending',
-                    function: () {},
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  SizedBox(
-                    height: 250.0,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => buildMoviePoster(),
-                      separatorBuilder: (context, index) => const SizedBox(
-                        width: 16.0,
-                      ),
-                      itemCount: 5,
+                    const SizedBox(
+                      height: 20.0,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  header(
-                    context: context,
-                    text: 'Latest movies',
-                    function: () {},
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  SizedBox(
-                    height: 250.0,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => buildMoviePoster(),
-                      separatorBuilder: (context, index) => const SizedBox(
-                        width: 16.0,
-                      ),
-                      itemCount: 5,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildDrawerItem(context: context, text: 'My Profile'),
+                        buildDrawerItem(
+                            context: context, text: 'My Favourites'),
+                        buildDrawerItem(
+                            context: context, text: 'My Watching List'),
+                        buildDrawerItem(context: context, text: 'Settings'),
+                      ],
                     ),
-                  ),
-                  const SizedBox(
-                    height: 24.0,
-                  ),
-                ],
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton(
+                              onPressed: () {
+                                navigateAndFinish(context, LoginScreen());
+                              },
+                              style: const ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(
+                                  defPink,
+                                ),
+                                alignment: AlignmentDirectional.centerStart,
+                                shape: WidgetStatePropertyAll(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero,
+                                  ),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text(
+                                  'Log Out',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
+            body: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                color: defBlack,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: CarouselSlider.builder(
+                        itemCount: 3,
+                        itemBuilder: (context, index, pageViewIndex) {
+                          return Stack(
+                            alignment: Alignment.bottomLeft,
+                            children: [
+                              Container(
+                                foregroundDecoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      defBlack,
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    stops: [0.4, 0.9],
+                                  ),
+                                ),
+                                child: const Image(
+                                  width: double.infinity,
+                                  image: NetworkImage(
+                                      'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/action-mistery-movie-poster-design-template-2ec690d65c22aa12e437d765dbf7e4af_screen.jpg?ts=1680854635'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: Text(
+                                  'OUTSIDER (2020)',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                        options: CarouselOptions(
+                          height: 250.0,
+                          enableInfiniteScroll: true,
+                          autoPlay: true,
+                          viewportFraction: 1.0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    ConditionalBuilder(
+                      condition: AppCubit.get(context).genresModel != null &&
+                          AppCubit.get(context).userModel != null,
+                      fallback: (context) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                      builder: (context) {
+                        return SizedBox(
+                          height: 50.0,
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) => genreItem(
+                                context,
+                                AppCubit.get(context)
+                                    .genresModel!
+                                    .genres![index]),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(
+                              width: 10.0,
+                            ),
+                            itemCount: AppCubit.get(context)
+                                .genresModel!
+                                .genres!
+                                .length,
+                          ),
+                        );
+                      },
+                    ),
+                    header(
+                      context: context,
+                      text: 'Last watched',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    SizedBox(
+                      height: 200.0,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) =>
+                            lastWatchedListItem(context),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          width: 16.0,
+                        ),
+                        itemCount: 5,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    header(
+                      context: context,
+                      text: 'Trending',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    SizedBox(
+                      height: 250.0,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => buildMoviePoster(),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          width: 16.0,
+                        ),
+                        itemCount: 5,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    header(
+                      context: context,
+                      text: 'Latest movies',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    SizedBox(
+                      height: 250.0,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => buildMoviePoster(),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          width: 16.0,
+                        ),
+                        itemCount: 5,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 24.0,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          fallback: (context) => const Center(
+            child: CircularProgressIndicator(),
           ),
         );
       },
@@ -316,6 +451,29 @@ Widget buildMoviePoster() {
           image: NetworkImage(
               'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/action-mistery-movie-poster-design-template-2ec690d65c22aa12e437d765dbf7e4af_screen.jpg?ts=1680854635'),
           fit: BoxFit.cover,
+        ),
+      ),
+    ),
+  );
+}
+
+Widget buildDrawerItem({required context, required String text}) {
+  return SizedBox(
+    width: double.infinity,
+    child: TextButton(
+      onPressed: () {},
+      style: const ButtonStyle(
+          alignment: AlignmentDirectional.centerStart,
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Removes the border radius
+            ),
+          )),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ),
     ),
