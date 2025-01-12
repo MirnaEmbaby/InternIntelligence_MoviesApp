@@ -45,7 +45,9 @@ class MyApp extends StatelessWidget {
       create: (context) => AppCubit()
         ..getUserData()
         ..getGenres()
-        ..exploreMovies(),
+        ..exploreMovies()
+        ..getTrendingMovies()
+        ..getTrendingShowsMovies(),
       child: BlocConsumer<AppCubit, AppStates>(
         builder: (context, state) {
           return SafeArea(

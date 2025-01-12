@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
-import 'package:movies_app/models/movie_details_model.dart';
 import 'package:movies_app/models/movie_model.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/shared/network/remote/dio_helper.dart';
@@ -64,5 +63,37 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
-  MovieDetailsModel? movieDetailModel;
+  MovieModel? trendingModel;
+
+  void getTrendingMovies() {
+    emit(GetTrendingMoviesLoadingState());
+    DioHelper.getData(
+      url: trending,
+      token: token,
+    ).then((value) {
+      debugPrint(value.data.toString());
+      trendingModel = MovieModel.fromJson(value.data);
+      emit(GetTrendingMoviesSuccessState());
+    }).catchError((error) {
+      debugPrint(error.toString());
+      emit(GetTrendingMoviesErrorState());
+    });
+  }
+
+  MovieModel? trendingShowsModel;
+
+  void getTrendingShowsMovies() {
+    emit(GetTrendingShowsLoadingState());
+    DioHelper.getData(
+      url: trendingShows,
+      token: token,
+    ).then((value) {
+      debugPrint(value.data.toString());
+      trendingShowsModel = MovieModel.fromJson(value.data);
+      emit(GetTrendingShowsSuccessState());
+    }).catchError((error) {
+      debugPrint(error.toString());
+      emit(GetTrendingShowsErrorState());
+    });
+  }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/modules/login_screen/login_screen.dart';
+import 'package:movies_app/shared/network/local/cache_helper.dart';
 import 'package:movies_app/shared/styles/colors.dart';
 
 void navigateTo(context, widget) => Navigator.push(
@@ -68,4 +70,10 @@ Widget defButton({
           .copyWith(fontWeight: FontWeight.bold),
     ),
   );
+}
+
+void logOut(context) {
+  CacheHelper.removeData(key: 'uId').then((value) {
+    navigateAndFinish(context, LoginScreen());
+  });
 }

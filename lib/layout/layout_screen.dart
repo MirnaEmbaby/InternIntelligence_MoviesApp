@@ -5,8 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
-import 'package:movies_app/models/movie_model.dart';
-import 'package:movies_app/modules/login_screen/login_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/shared/styles/colors.dart';
@@ -22,8 +20,7 @@ class LayoutScreen extends StatelessWidget {
         var model = AppCubit.get(context).userModel;
 
         return ConditionalBuilder(
-          condition: AppCubit.get(context).userModel != null &&
-              AppCubit.get(context).movieModel != null,
+          condition: AppCubit.get(context).userModel != null,
           builder: (context) => Scaffold(
             appBar: AppBar(
               backgroundColor: defBlack,
@@ -115,7 +112,7 @@ class LayoutScreen extends StatelessWidget {
                             width: double.infinity,
                             child: TextButton(
                               onPressed: () {
-                                navigateAndFinish(context, LoginScreen());
+                                logOut(context);
                               },
                               style: const ButtonStyle(
                                 backgroundColor: WidgetStatePropertyAll(
@@ -242,17 +239,23 @@ class LayoutScreen extends StatelessWidget {
                     const SizedBox(
                       height: 16.0,
                     ),
-                    SizedBox(
-                      height: 250.0,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => buildMoviePoster(
-                            AppCubit.get(context).movieModel!.results![index]),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          width: 16.0,
+                    ConditionalBuilder(
+                      condition: AppCubit.get(context).movieModel != null,
+                      builder: (context) => SizedBox(
+                        height: 250.0,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => buildMoviePoster(
+                              "https://image.tmdb.org/t/p/w500${AppCubit.get(context).movieModel!.results![index].posterPath!}"),
+                          separatorBuilder: (context, index) => const SizedBox(
+                            width: 16.0,
+                          ),
+                          itemCount: 5,
                         ),
-                        itemCount: 5,
+                      ),
+                      fallback: (context) => const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
                     const SizedBox(
@@ -284,23 +287,29 @@ class LayoutScreen extends StatelessWidget {
                     ),
                     header(
                       context: context,
-                      text: 'Trending',
+                      text: 'Trending movies',
                       function: () {},
                     ),
                     const SizedBox(
                       height: 16.0,
                     ),
-                    SizedBox(
-                      height: 250.0,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => buildMoviePoster(
-                            AppCubit.get(context).movieModel!.results![index]),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          width: 16.0,
+                    ConditionalBuilder(
+                      condition: AppCubit.get(context).trendingModel != null,
+                      builder: (context) => SizedBox(
+                        height: 250.0,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => buildMoviePoster(
+                              "https://image.tmdb.org/t/p/w500${AppCubit.get(context).trendingModel!.results![index].posterPath!}"),
+                          separatorBuilder: (context, index) => const SizedBox(
+                            width: 16.0,
+                          ),
+                          itemCount: 5,
                         ),
-                        itemCount: 5,
+                      ),
+                      fallback: (context) => const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
                     const SizedBox(
@@ -308,23 +317,30 @@ class LayoutScreen extends StatelessWidget {
                     ),
                     header(
                       context: context,
-                      text: 'Latest movies',
+                      text: 'Trending TV shows',
                       function: () {},
                     ),
                     const SizedBox(
                       height: 16.0,
                     ),
-                    SizedBox(
-                      height: 250.0,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => buildMoviePoster(
-                            AppCubit.get(context).movieModel!.results![index]),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          width: 16.0,
+                    ConditionalBuilder(
+                      condition:
+                          AppCubit.get(context).trendingShowsModel != null,
+                      builder: (context) => SizedBox(
+                        height: 250.0,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => buildMoviePoster(
+                              "https://image.tmdb.org/t/p/w500${AppCubit.get(context).trendingShowsModel!.results![index].posterPath!}"),
+                          separatorBuilder: (context, index) => const SizedBox(
+                            width: 16.0,
+                          ),
+                          itemCount: 5,
                         ),
-                        itemCount: 5,
+                      ),
+                      fallback: (context) => const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
                     const SizedBox(
@@ -465,7 +481,7 @@ Widget lastWatchedListItem(context) {
   );
 }
 
-Widget buildMoviePoster(Results movie) {
+Widget buildMoviePoster(String image) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(10.0),
     child: InkWell(
@@ -476,8 +492,7 @@ Widget buildMoviePoster(Results movie) {
         child: Image(
           width: double.infinity,
           height: double.infinity,
-          image: NetworkImage(
-              "https://image.tmdb.org/t/p/w500${movie.posterPath!}"),
+          image: NetworkImage(image),
           fit: BoxFit.cover,
         ),
       ),
