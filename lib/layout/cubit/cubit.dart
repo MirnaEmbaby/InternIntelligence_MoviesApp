@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
+import 'package:movies_app/models/movie_details_model.dart';
+import 'package:movies_app/models/movie_model.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/shared/network/remote/dio_helper.dart';
 import 'package:movies_app/shared/network/remote/end_points.dart';
@@ -44,4 +46,23 @@ class AppCubit extends Cubit<AppStates> {
       emit(GetGenresErrorState());
     });
   }
+
+  MovieModel? movieModel;
+
+  void exploreMovies() {
+    emit(GetMoviesLoadingState());
+    DioHelper.getData(
+      url: explore,
+      token: token,
+    ).then((value) {
+      debugPrint(value.data.toString());
+      movieModel = MovieModel.fromJson(value.data);
+      emit(GetMoviesSuccessState());
+    }).catchError((error) {
+      debugPrint(error.toString());
+      emit(GetMoviesErrorState());
+    });
+  }
+
+  MovieDetailsModel? movieDetailModel;
 }

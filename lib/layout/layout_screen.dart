@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
+import 'package:movies_app/models/movie_model.dart';
 import 'package:movies_app/modules/login_screen/login_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
@@ -21,7 +22,8 @@ class LayoutScreen extends StatelessWidget {
         var model = AppCubit.get(context).userModel;
 
         return ConditionalBuilder(
-          condition: AppCubit.get(context).userModel != null,
+          condition: AppCubit.get(context).userModel != null &&
+              AppCubit.get(context).movieModel != null,
           builder: (context) => Scaffold(
             appBar: AppBar(
               backgroundColor: defBlack,
@@ -234,6 +236,30 @@ class LayoutScreen extends StatelessWidget {
                     ),
                     header(
                       context: context,
+                      text: 'Explore',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    SizedBox(
+                      height: 250.0,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => buildMoviePoster(
+                            AppCubit.get(context).movieModel!.results![index]),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          width: 16.0,
+                        ),
+                        itemCount: 5,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    header(
+                      context: context,
                       text: 'Last watched',
                       function: () {},
                     ),
@@ -269,7 +295,8 @@ class LayoutScreen extends StatelessWidget {
                       child: ListView.separated(
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => buildMoviePoster(),
+                        itemBuilder: (context, index) => buildMoviePoster(
+                            AppCubit.get(context).movieModel!.results![index]),
                         separatorBuilder: (context, index) => const SizedBox(
                           width: 16.0,
                         ),
@@ -292,7 +319,8 @@ class LayoutScreen extends StatelessWidget {
                       child: ListView.separated(
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => buildMoviePoster(),
+                        itemBuilder: (context, index) => buildMoviePoster(
+                            AppCubit.get(context).movieModel!.results![index]),
                         separatorBuilder: (context, index) => const SizedBox(
                           width: 16.0,
                         ),
@@ -437,19 +465,19 @@ Widget lastWatchedListItem(context) {
   );
 }
 
-Widget buildMoviePoster() {
+Widget buildMoviePoster(Results movie) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(10.0),
     child: InkWell(
       onTap: () {},
-      child: const SizedBox(
+      child: SizedBox(
         width: 140.0,
         height: 100,
         child: Image(
           width: double.infinity,
           height: double.infinity,
           image: NetworkImage(
-              'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/action-mistery-movie-poster-design-template-2ec690d65c22aa12e437d765dbf7e4af_screen.jpg?ts=1680854635'),
+              "https://image.tmdb.org/t/p/w500${movie.posterPath!}"),
           fit: BoxFit.cover,
         ),
       ),
