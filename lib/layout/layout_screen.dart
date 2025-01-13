@@ -5,7 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
+import 'package:movies_app/modules/favourites_screen/favourites_screen.dart';
+import 'package:movies_app/modules/profile_screen/profile_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
+import 'package:movies_app/modules/settings_screen/settings_screen.dart';
+import 'package:movies_app/modules/watching_list_screen/watching_list_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/shared/styles/colors.dart';
 
@@ -22,31 +26,39 @@ class LayoutScreen extends StatelessWidget {
         return ConditionalBuilder(
           condition: AppCubit.get(context).userModel != null,
           builder: (context) => Scaffold(
-            appBar: AppBar(
-              backgroundColor: defBlack,
-              actionsIconTheme: const IconThemeData(
-                color: defWhite,
-              ),
-              iconTheme: const IconThemeData(
-                color: defWhite,
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.search_outlined,
-                    size: 30.0,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(60.0),
+              child: AppBar(
+                titleSpacing: 0.0,
+                title: Text(
+                  'Home',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                backgroundColor: defBlack,
+                actionsIconTheme: const IconThemeData(
+                  color: defWhite,
+                ),
+                iconTheme: const IconThemeData(
+                  color: defWhite,
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.search_outlined,
+                      size: 30.0,
+                    ),
+                    onPressed: () {
+                      navigateTo(
+                        context,
+                        const SearchScreen(),
+                      );
+                    },
                   ),
-                  onPressed: () {
-                    navigateTo(
-                      context,
-                      const SearchScreen(),
-                    );
-                  },
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-              ],
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                ],
+              ),
             ),
             drawer: Drawer(
               backgroundColor: defBlack,
@@ -60,26 +72,11 @@ class LayoutScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                model!.image,
-                              ),
-                              radius: 70.0,
-                            ),
-                            CircleAvatar(
-                              radius: 18.0,
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.camera_alt_outlined,
-                                  size: 20.0,
-                                ),
-                              ),
-                            ),
-                          ],
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            model!.image,
+                          ),
+                          radius: 70.0,
                         ),
                         const SizedBox(
                           height: 20.0,
@@ -96,12 +93,26 @@ class LayoutScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildDrawerItem(context: context, text: 'My Profile'),
                         buildDrawerItem(
-                            context: context, text: 'My Favourites'),
+                          context: context,
+                          text: 'My Profile',
+                          screen: const ProfileScreen(),
+                        ),
                         buildDrawerItem(
-                            context: context, text: 'My Watching List'),
-                        buildDrawerItem(context: context, text: 'Settings'),
+                          context: context,
+                          text: 'My Favourites',
+                          screen: const FavouritesScreen(),
+                        ),
+                        buildDrawerItem(
+                          context: context,
+                          text: 'My Watching List',
+                          screen: const WatchingListScreen(),
+                        ),
+                        buildDrawerItem(
+                          context: context,
+                          text: 'Settings',
+                          screen: const SettingsScreen(),
+                        ),
                       ],
                     ),
                     Expanded(
@@ -118,7 +129,7 @@ class LayoutScreen extends StatelessWidget {
                                 backgroundColor: WidgetStatePropertyAll(
                                   defPink,
                                 ),
-                                alignment: AlignmentDirectional.centerStart,
+                                alignment: AlignmentDirectional.center,
                                 shape: WidgetStatePropertyAll(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.zero,
@@ -144,7 +155,10 @@ class LayoutScreen extends StatelessWidget {
             body: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Container(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 10.0,
+                ),
                 color: defBlack,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -233,6 +247,30 @@ class LayoutScreen extends StatelessWidget {
                     ),
                     header(
                       context: context,
+                      text: 'Last watched',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    SizedBox(
+                      height: 200.0,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) =>
+                            lastWatchedListItem(context),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          width: 16.0,
+                        ),
+                        itemCount: 5,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    header(
+                      context: context,
                       text: 'Explore',
                       function: () {},
                     ),
@@ -256,30 +294,6 @@ class LayoutScreen extends StatelessWidget {
                       ),
                       fallback: (context) => const Center(
                         child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 16.0,
-                    ),
-                    header(
-                      context: context,
-                      text: 'Last watched',
-                      function: () {},
-                    ),
-                    const SizedBox(
-                      height: 16.0,
-                    ),
-                    SizedBox(
-                      height: 200.0,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) =>
-                            lastWatchedListItem(context),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          width: 16.0,
-                        ),
-                        itemCount: 5,
                       ),
                     ),
                     const SizedBox(
@@ -500,11 +514,15 @@ Widget buildMoviePoster(String image) {
   );
 }
 
-Widget buildDrawerItem({required context, required String text}) {
+Widget buildDrawerItem({
+  required context,
+  required String text,
+  required Widget screen,
+}) {
   return SizedBox(
     width: double.infinity,
     child: TextButton(
-      onPressed: () {},
+      onPressed: () => navigateTo(context, screen),
       style: const ButtonStyle(
           alignment: AlignmentDirectional.centerStart,
           shape: WidgetStatePropertyAll(
