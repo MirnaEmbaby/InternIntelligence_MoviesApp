@@ -97,10 +97,15 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
+  MovieModel? genreMovieList;
+
   void getGenreMovies(String id) {
     DioHelper.getData(url: explore, token: token, query: {"with_genres": id})
         .then((value) {
+      genreMovieList = MovieModel.fromJson(value.data);
       debugPrint(value.data.toString());
+      debugPrint('-----------------------------------------');
+      debugPrint(genreMovieList!.results!.first.title);
       emit(GetGenreMoviesSuccessState());
     }).catchError((error) {
       emit(GetGenreMoviesErrorState());

@@ -7,6 +7,8 @@ import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
 import 'package:movies_app/models/movie_model.dart';
 import 'package:movies_app/modules/favourites_screen/favourites_screen.dart';
+import 'package:movies_app/modules/genre_movies_screen/genre_movies_screen.dart';
+import 'package:movies_app/modules/movie_details_screen/movie_details_screen.dart';
 import 'package:movies_app/modules/profile_screen/profile_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
 import 'package:movies_app/modules/settings_screen/settings_screen.dart';
@@ -166,11 +168,11 @@ class LayoutScreen extends StatelessWidget {
                   children: [
                     header(
                       context: context,
-                      text: 'Trending movies',
-                      function: () {},
+                      text: 'TRENDING NOW 🔥',
+                      moveList: AppCubit.get(context).trendingModel!,
                     ),
                     const SizedBox(
-                      height: 16.0,
+                      height: 8.0,
                     ),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10.0),
@@ -186,6 +188,12 @@ class LayoutScreen extends StatelessWidget {
                                   AppCubit.get(context)
                                       .trendingModel!
                                       .results![index],
+                                );
+                                navigateTo(
+                                  context,
+                                  MovieDetailsScreen(AppCubit.get(context)
+                                      .trendingModel!
+                                      .results![index]),
                                 );
                               },
                               child: Stack(
@@ -258,12 +266,20 @@ class LayoutScreen extends StatelessWidget {
                               list: AppCubit.get(context)
                                   .genresModel!
                                   .genres![index],
-                              function: () => AppCubit.get(context)
-                                  .getGenreMovies(AppCubit.get(context)
-                                      .genresModel!
-                                      .genres![index]
-                                      .id
-                                      .toString()),
+                              function: () {
+                                AppCubit.get(context).getGenreMovies(
+                                    AppCubit.get(context)
+                                        .genresModel!
+                                        .genres![index]
+                                        .id
+                                        .toString());
+                                navigateTo(
+                                  context,
+                                  MoviesListScreen(
+                                      movieList: AppCubit.get(context)
+                                          .genreMovieList!),
+                                );
+                              },
                             ),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(
@@ -278,15 +294,14 @@ class LayoutScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(
-                      height: 16.0,
+                      height: 24.0,
                     ),
-                    header(
-                      context: context,
-                      text: 'Last watched',
-                      function: () {},
+                    Text(
+                      'Last watched',
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(
-                      height: 16.0,
+                      height: 20.0,
                     ),
                     ConditionalBuilder(
                       condition:
@@ -324,7 +339,7 @@ class LayoutScreen extends StatelessWidget {
                     header(
                       context: context,
                       text: 'Explore',
-                      function: () {},
+                      moveList: AppCubit.get(context).movieModel!,
                     ),
                     const SizedBox(
                       height: 16.0,
@@ -363,7 +378,7 @@ class LayoutScreen extends StatelessWidget {
                     header(
                       context: context,
                       text: 'Top rated movies',
-                      function: () {},
+                      moveList: AppCubit.get(context).topRatedMoviesModel!,
                     ),
                     const SizedBox(
                       height: 16.0,
@@ -400,7 +415,7 @@ class LayoutScreen extends StatelessWidget {
                     header(
                       context: context,
                       text: 'Upcoming movies',
-                      function: () {},
+                      moveList: AppCubit.get(context).upcomingMoviesModel!,
                     ),
                     const SizedBox(
                       height: 16.0,
@@ -479,7 +494,7 @@ Widget genreItem({
 Widget header({
   required context,
   required String text,
-  required Function function,
+  required MovieModel moveList,
 }) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
@@ -490,7 +505,12 @@ Widget header({
       ),
       const Spacer(),
       TextButton(
-        onPressed: () => function(),
+        onPressed: () {
+          navigateTo(
+            context,
+            MoviesListScreen(movieList: moveList),
+          );
+        },
         style: const ButtonStyle(
           padding: WidgetStatePropertyAll(EdgeInsets.zero),
         ),
@@ -510,7 +530,12 @@ Widget lastWatchedListItem({
   return ClipRRect(
     borderRadius: BorderRadius.circular(10.0),
     child: InkWell(
-      onTap: () {},
+      onTap: () {
+        navigateTo(
+          context,
+          MovieDetailsScreen(movie),
+        );
+      },
       child: SizedBox(
         width: 250.0,
         height: 100.0,
@@ -558,7 +583,7 @@ Widget lastWatchedListItem({
                         icon: const Icon(
                           color: defWhite,
                           size: 20.0,
-                          Icons.favorite_border_rounded,
+                          Icons.bookmark_border_outlined,
                         ),
                       ),
                     ],
@@ -583,6 +608,10 @@ Widget buildMoviePoster(
     child: InkWell(
       onTap: () {
         AppCubit.get(context).addLastWatchedMovie(movieModel);
+        navigateTo(
+          context,
+          MovieDetailsScreen(movieModel),
+        );
       },
       child: SizedBox(
         width: 140.0,
