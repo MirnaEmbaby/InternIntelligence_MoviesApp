@@ -6,13 +6,13 @@ class GetUserDataSuccessState extends AppStates {}
 
 class GetUserDataErrorState extends AppStates {}
 
-class LogOutSuccessState extends AppStates {}
-
-class LogOutErrorState extends AppStates {}
-
 class GetGenresSuccessState extends AppStates {}
 
 class GetGenresErrorState extends AppStates {}
+
+class GetGenreMoviesSuccessState extends AppStates {}
+
+class GetGenreMoviesErrorState extends AppStates {}
 
 class GetMoviesLoadingState extends AppStates {}
 
@@ -20,14 +20,22 @@ class GetMoviesSuccessState extends AppStates {}
 
 class GetMoviesErrorState extends AppStates {}
 
+class GetTopRatedMoviesLoadingState extends AppStates {}
+
+class GetTopRatedMoviesSuccessState extends AppStates {}
+
+class GetTopRatedMoviesErrorState extends AppStates {}
+
 class GetTrendingMoviesLoadingState extends AppStates {}
 
 class GetTrendingMoviesSuccessState extends AppStates {}
 
 class GetTrendingMoviesErrorState extends AppStates {}
 
-class GetTrendingShowsLoadingState extends AppStates {}
+class GetUpcomingMoviesLoadingState extends AppStates {}
 
-class GetTrendingShowsSuccessState extends AppStates {}
+class GetUpcomingMoviesSuccessState extends AppStates {}
 
-class GetTrendingShowsErrorState extends AppStates {}
+class GetUpcomingMoviesErrorState extends AppStates {}
+
+class MovieAdded extends AppStates {}

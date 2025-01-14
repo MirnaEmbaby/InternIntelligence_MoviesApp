@@ -6,4 +6,6 @@ const String explore = '3/discover/movie';
 
 const String trending = '3/trending/movie/week';
 
-const String trendingShows = '3/trending/tv/week';
+const String upcoming = '3/movie/upcoming';
+
+const String topRated = '3/movie/top_rated';

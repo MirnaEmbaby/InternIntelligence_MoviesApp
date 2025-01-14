@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/layout/cubit/cubit.dart';
 import 'package:movies_app/layout/cubit/states.dart';
 import 'package:movies_app/models/genres_model.dart';
+import 'package:movies_app/models/movie_model.dart';
 import 'package:movies_app/modules/favourites_screen/favourites_screen.dart';
 import 'package:movies_app/modules/profile_screen/profile_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
@@ -157,50 +158,74 @@ class LayoutScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20.0,
-                  vertical: 10.0,
                 ),
                 color: defBlack,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    header(
+                      context: context,
+                      text: 'Trending movies',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10.0),
                       child: CarouselSlider.builder(
-                        itemCount: 3,
+                        itemCount: 5,
                         itemBuilder: (context, index, pageViewIndex) {
-                          return Stack(
-                            alignment: Alignment.bottomLeft,
-                            children: [
-                              Container(
-                                foregroundDecoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      defBlack,
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    stops: [0.4, 0.9],
+                          return ConditionalBuilder(
+                            condition:
+                                AppCubit.get(context).trendingModel != null,
+                            builder: (context) => InkWell(
+                              onTap: () {
+                                AppCubit.get(context).addLastWatchedMovie(
+                                  AppCubit.get(context)
+                                      .trendingModel!
+                                      .results![index],
+                                );
+                              },
+                              child: Stack(
+                                alignment: Alignment.bottomLeft,
+                                children: [
+                                  Container(
+                                    foregroundDecoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.transparent,
+                                          defBlack,
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        stops: [0.4, 0.9],
+                                      ),
+                                    ),
+                                    child: Image(
+                                      width: double.infinity,
+                                      image: NetworkImage(
+                                          "https://image.tmdb.org/t/p/w500${AppCubit.get(context).trendingModel!.results![index].posterPath!}"),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                                child: const Image(
-                                  width: double.infinity,
-                                  image: NetworkImage(
-                                      'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/action-mistery-movie-poster-design-template-2ec690d65c22aa12e437d765dbf7e4af_screen.jpg?ts=1680854635'),
-                                  fit: BoxFit.cover,
-                                ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(14.0),
+                                    child: Text(
+                                      "${AppCubit.get(context).trendingModel!.results![index].title!}  "
+                                      "${DateTime.parse(AppCubit.get(context).trendingModel!.results![index].releaseDate!).year}",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(14.0),
-                                child: Text(
-                                  'OUTSIDER (2020)',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium,
-                                ),
-                              ),
-                            ],
+                            ),
+                            fallback: (context) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                           );
                         },
                         options: CarouselOptions(
@@ -212,7 +237,7 @@ class LayoutScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(
-                      height: 16.0,
+                      height: 24.0,
                     ),
                     ConditionalBuilder(
                       condition: AppCubit.get(context).genresModel != null &&
@@ -229,10 +254,17 @@ class LayoutScreen extends StatelessWidget {
                             shrinkWrap: true,
                             scrollDirection: Axis.horizontal,
                             itemBuilder: (context, index) => genreItem(
-                                context,
-                                AppCubit.get(context)
-                                    .genresModel!
-                                    .genres![index]),
+                              context: context,
+                              list: AppCubit.get(context)
+                                  .genresModel!
+                                  .genres![index],
+                              function: () => AppCubit.get(context)
+                                  .getGenreMovies(AppCubit.get(context)
+                                      .genresModel!
+                                      .genres![index]
+                                      .id
+                                      .toString()),
+                            ),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(
                               width: 10.0,
@@ -245,6 +277,9 @@ class LayoutScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
                     header(
                       context: context,
                       text: 'Last watched',
@@ -253,17 +288,34 @@ class LayoutScreen extends StatelessWidget {
                     const SizedBox(
                       height: 16.0,
                     ),
-                    SizedBox(
-                      height: 200.0,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) =>
-                            lastWatchedListItem(context),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          width: 16.0,
+                    ConditionalBuilder(
+                      condition:
+                          AppCubit.get(context).lastWatchedMovies!.isNotEmpty,
+                      builder: (context) => SizedBox(
+                        height: 200.0,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => lastWatchedListItem(
+                              context: context,
+                              movie: AppCubit.get(context)
+                                  .lastWatchedMovies![index]),
+                          separatorBuilder: (context, index) => const SizedBox(
+                            width: 16.0,
+                          ),
+                          itemCount:
+                              AppCubit.get(context).lastWatchedMovies!.length,
                         ),
-                        itemCount: 5,
+                      ),
+                      fallback: (context) => Center(
+                        heightFactor: 10,
+                        child: Text(
+                          'You didn\'t watch any movies recently',
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Colors.grey,
+                                  ),
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -284,8 +336,17 @@ class LayoutScreen extends StatelessWidget {
                         child: ListView.separated(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => buildMoviePoster(
-                              "https://image.tmdb.org/t/p/w500${AppCubit.get(context).movieModel!.results![index].posterPath!}"),
+                          itemBuilder: (context, index) {
+                            return buildMoviePoster(
+                              index: index,
+                              context: context,
+                              movieModel: AppCubit.get(context)
+                                  .movieModel!
+                                  .results![index],
+                              image:
+                                  "https://image.tmdb.org/t/p/w500${AppCubit.get(context).movieModel!.results![index].posterPath!}",
+                            );
+                          },
                           separatorBuilder: (context, index) => const SizedBox(
                             width: 16.0,
                           ),
@@ -301,37 +362,7 @@ class LayoutScreen extends StatelessWidget {
                     ),
                     header(
                       context: context,
-                      text: 'Trending movies',
-                      function: () {},
-                    ),
-                    const SizedBox(
-                      height: 16.0,
-                    ),
-                    ConditionalBuilder(
-                      condition: AppCubit.get(context).trendingModel != null,
-                      builder: (context) => SizedBox(
-                        height: 250.0,
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => buildMoviePoster(
-                              "https://image.tmdb.org/t/p/w500${AppCubit.get(context).trendingModel!.results![index].posterPath!}"),
-                          separatorBuilder: (context, index) => const SizedBox(
-                            width: 16.0,
-                          ),
-                          itemCount: 5,
-                        ),
-                      ),
-                      fallback: (context) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 16.0,
-                    ),
-                    header(
-                      context: context,
-                      text: 'Trending TV shows',
+                      text: 'Top rated movies',
                       function: () {},
                     ),
                     const SizedBox(
@@ -339,14 +370,58 @@ class LayoutScreen extends StatelessWidget {
                     ),
                     ConditionalBuilder(
                       condition:
-                          AppCubit.get(context).trendingShowsModel != null,
+                          AppCubit.get(context).topRatedMoviesModel != null,
                       builder: (context) => SizedBox(
                         height: 250.0,
                         child: ListView.separated(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) => buildMoviePoster(
-                              "https://image.tmdb.org/t/p/w500${AppCubit.get(context).trendingShowsModel!.results![index].posterPath!}"),
+                              index: index,
+                              context: context,
+                              movieModel: AppCubit.get(context)
+                                  .topRatedMoviesModel!
+                                  .results![index],
+                              image:
+                                  "https://image.tmdb.org/t/p/w500${AppCubit.get(context).topRatedMoviesModel!.results![index].posterPath!}"),
+                          separatorBuilder: (context, index) => const SizedBox(
+                            width: 16.0,
+                          ),
+                          itemCount: 5,
+                        ),
+                      ),
+                      fallback: (context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    header(
+                      context: context,
+                      text: 'Upcoming movies',
+                      function: () {},
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    ConditionalBuilder(
+                      condition:
+                          AppCubit.get(context).upcomingMoviesModel != null,
+                      builder: (context) => SizedBox(
+                        height: 250.0,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => buildMoviePoster(
+                            index: index,
+                            context: context,
+                            movieModel: AppCubit.get(context)
+                                .upcomingMoviesModel!
+                                .results![index],
+                            image:
+                                "https://image.tmdb.org/t/p/w500${AppCubit.get(context).upcomingMoviesModel!.results![index].posterPath!}",
+                          ),
                           separatorBuilder: (context, index) => const SizedBox(
                             width: 16.0,
                           ),
@@ -374,9 +449,13 @@ class LayoutScreen extends StatelessWidget {
   }
 }
 
-Widget genreItem(context, Genres list) {
+Widget genreItem({
+  required context,
+  required Genres list,
+  required Function function,
+}) {
   return TextButton(
-    onPressed: () {},
+    onPressed: () => function(),
     style: const ButtonStyle(
       padding: WidgetStatePropertyAll(
         EdgeInsets.symmetric(
@@ -403,7 +482,6 @@ Widget header({
   required Function function,
 }) {
   return Row(
-    crossAxisAlignment: CrossAxisAlignment.end,
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Text(
@@ -414,7 +492,6 @@ Widget header({
       TextButton(
         onPressed: () => function(),
         style: const ButtonStyle(
-          alignment: Alignment.bottomRight,
           padding: WidgetStatePropertyAll(EdgeInsets.zero),
         ),
         child: Text(
@@ -426,23 +503,24 @@ Widget header({
   );
 }
 
-Widget lastWatchedListItem(context) {
+Widget lastWatchedListItem({
+  required context,
+  required Results movie,
+}) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(10.0),
     child: InkWell(
-      onTap: () {
-        AppCubit.get(context).getGenres();
-      },
+      onTap: () {},
       child: SizedBox(
         width: 250.0,
         height: 100.0,
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
-            const Image(
+            Image(
               width: double.infinity,
               image: NetworkImage(
-                  'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/action-mistery-movie-poster-design-template-2ec690d65c22aa12e437d765dbf7e4af_screen.jpg?ts=1680854635'),
+                  "https://image.tmdb.org/t/p/w500${movie.posterPath}"),
               fit: BoxFit.cover,
             ),
             Container(
@@ -455,7 +533,7 @@ Widget lastWatchedListItem(context) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'This is a movie name movie name movie name movie name movie name movie name movie name movie name ',
+                    movie.title!,
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -467,7 +545,7 @@ Widget lastWatchedListItem(context) {
                   Row(
                     children: [
                       Text(
-                        '12:12:12  2020',
+                        movie.releaseDate!,
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall!
@@ -495,11 +573,17 @@ Widget lastWatchedListItem(context) {
   );
 }
 
-Widget buildMoviePoster(String image) {
+Widget buildMoviePoster(
+    {required String image,
+    required context,
+    required int index,
+    required Results movieModel}) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(10.0),
     child: InkWell(
-      onTap: () {},
+      onTap: () {
+        AppCubit.get(context).addLastWatchedMovie(movieModel);
+      },
       child: SizedBox(
         width: 140.0,
         height: 100,

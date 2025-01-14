@@ -80,20 +80,65 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
-  MovieModel? trendingShowsModel;
+  MovieModel? upcomingMoviesModel;
 
-  void getTrendingShowsMovies() {
-    emit(GetTrendingShowsLoadingState());
+  void getUpcomingMovies() {
+    emit(GetUpcomingMoviesLoadingState());
     DioHelper.getData(
-      url: trendingShows,
+      url: upcoming,
       token: token,
     ).then((value) {
       debugPrint(value.data.toString());
-      trendingShowsModel = MovieModel.fromJson(value.data);
-      emit(GetTrendingShowsSuccessState());
+      upcomingMoviesModel = MovieModel.fromJson(value.data);
+      emit(GetUpcomingMoviesSuccessState());
     }).catchError((error) {
       debugPrint(error.toString());
-      emit(GetTrendingShowsErrorState());
+      emit(GetUpcomingMoviesErrorState());
     });
+  }
+
+  void getGenreMovies(String id) {
+    DioHelper.getData(url: explore, token: token, query: {"with_genres": id})
+        .then((value) {
+      debugPrint(value.data.toString());
+      emit(GetGenreMoviesSuccessState());
+    }).catchError((error) {
+      emit(GetGenreMoviesErrorState());
+    });
+  }
+
+  MovieModel? topRatedMoviesModel;
+
+  void getTopRatedMovies() {
+    emit(GetTopRatedMoviesLoadingState());
+    DioHelper.getData(
+      url: topRated,
+      token: token,
+    ).then((value) {
+      debugPrint(value.data.toString());
+      topRatedMoviesModel = MovieModel.fromJson(value.data);
+      emit(GetTopRatedMoviesSuccessState());
+    }).catchError((error) {
+      debugPrint(error.toString());
+      emit(GetTopRatedMoviesErrorState());
+    });
+  }
+
+  List<Results>? lastWatchedMovies = [];
+
+  void addLastWatchedMovie(Results movie) {
+    if (lastWatchedMovies!.contains(movie)) {
+      lastWatchedMovies!.remove(movie);
+    }
+
+    lastWatchedMovies!.insert(0, movie);
+
+    if (lastWatchedMovies!.length > 10) {
+      lastWatchedMovies!.removeRange(10, lastWatchedMovies!.length);
+    }
+    emit(MovieAdded());
+    debugPrint('----------------MOVIE WATCHED-----------------');
+    debugPrint(movie.title);
+    debugPrint(lastWatchedMovies!.length.toString());
   }
 }
